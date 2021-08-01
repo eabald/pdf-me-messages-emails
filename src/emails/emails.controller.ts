@@ -5,9 +5,7 @@ import { EmailWithTokenDto } from './dto/emailWithToken.dto';
 
 @Controller('emails')
 export class EmailsController {
-  constructor(
-    private readonly emailsService: EmailsService,
-  ) {}
+  constructor(private readonly emailsService: EmailsService) {}
 
   @MessagePattern({ cmd: 'emails-send-reset-password' })
   async resetPasswordEmail(@Payload() payload: EmailWithTokenDto) {

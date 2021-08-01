@@ -1,27 +1,47 @@
 import { Injectable } from '@nestjs/common';
-import { createTransport } from 'nodemailer';
-import * as Mail from 'nodemailer/lib/mailer';
-import { ConfigService } from '@nestjs/config';
 import { EmailWithTokenDto } from './dto/emailWithToken.dto';
+import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
+import { ConfigService } from '@nestjs/config';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class EmailsService {
-  private nodemailerTransport: Mail;
+  constructor(
+    @InjectSendGrid() private readonly sendGridService: SendGridService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  constructor(private readonly configService: ConfigService) {
-    this.nodemailerTransport = createTransport({
-      service: configService.get('EMAIL_SERVICE'),
-      auth: {
-        user: configService.get('EMAIL_USER'),
-        pass: configService.get('EMAIL_PASSWORD'),
-      },
-    });
+  private async sendEmail(config) {
+    return await this.sendGridService.send(config);
   }
+
   async resetPasswordEmail({ email, token }: EmailWithTokenDto) {
-    return { email, token };
+    try {
+      return this.sendEmail({
+        to: email,
+        subject: 'Reset password',
+        from: 'no-reply@pdf-me.com',
+        html: `${this.configService.get(
+          'FRONT_URL',
+        )}/reset-password?token=${encodeURI(token)}`,
+      });
+    } catch (error) {
+      return new RpcException({ statusCode: 500, message: error });
+    }
   }
 
   async sendConfirmEmail({ email, token }: EmailWithTokenDto) {
-    return { email, token };
+    try {
+      return this.sendEmail({
+        to: email,
+        subject: 'Confirm email',
+        from: 'no-reply@pdf-me.com',
+        html: `${this.configService.get(
+          'FRONT_URL',
+        )}/confirm-email?token=${encodeURI(token)}`,
+      });
+    } catch (error) {
+      return new RpcException({ statusCode: 500, message: error });
+    }
   }
 }
