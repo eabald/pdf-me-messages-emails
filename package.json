@@ -1,5 +1,5 @@
 {
-  "name": "emails",
+  "name": "@pdf-me/emails",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -28,6 +28,7 @@
     "@nestjs/microservices": "^8.0.5",
     "@nestjs/platform-express": "^8.0.0",
     "@ntegral/nestjs-sendgrid": "^1.0.0",
+    "@pdf-me/shared": "^1.0.0",
     "@sendgrid/mail": "^7.4.5",
     "@types/nodemailer": "^6.4.4",
     "amqp-connection-manager": "^3.2.2",
