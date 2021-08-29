@@ -6,7 +6,7 @@ This service main concern is email management via SendGrid service.
 
 ## Development
 
-To start api-gateway service in development mode first of all install npm dependencies:
+To start emails service in development mode first of all install npm dependencies:
 
 ```bash
 npm i
