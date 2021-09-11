@@ -3,6 +3,7 @@ import { EmailsController } from './emails.controller';
 import { EmailsService } from './emails.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SendGridModule } from '@ntegral/nestjs-sendgrid';
+import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -16,6 +17,28 @@ import { SendGridModule } from '@ntegral/nestjs-sendgrid';
     }),
   ],
   controllers: [EmailsController],
-  providers: [EmailsService],
+  providers: [
+    EmailsService,
+    {
+      provide: 'INVOICES_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const user = configService.get('RABBITMQ_USER');
+        const password = configService.get('RABBITMQ_PASSWORD');
+        const host = configService.get('RABBITMQ_HOST');
+
+        return ClientProxyFactory.create({
+          transport: Transport.RMQ,
+          options: {
+            urls: [`amqp://${user}:${password}@${host}`],
+            queue: 'invoicesQueue',
+            queueOptions: {
+              durable: true,
+            },
+          },
+        });
+      },
+      inject: [ConfigService],
+    },
+  ],
 })
 export class EmailsModule {}

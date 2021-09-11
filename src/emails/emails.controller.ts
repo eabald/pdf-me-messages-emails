@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { EmailsService } from './emails.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { EmailWithTokenDto } from './dto/emailWithToken.dto';
+import { EmailWithTokenDto } from '@pdf-me/shared';
 
 @Controller('emails')
 export class EmailsController {
@@ -15,5 +15,10 @@ export class EmailsController {
   @MessagePattern({ cmd: 'emails-send-confirm-email' })
   async sendConfirmEmail(@Payload() payload: EmailWithTokenDto) {
     return this.emailsService.sendConfirmEmail(payload);
+  }
+
+  @MessagePattern({ cmd: 'emails-send-invoices' })
+  async sendInvoices() {
+    return this.emailsService.sendInvoices();
   }
 }

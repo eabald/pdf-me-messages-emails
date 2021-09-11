@@ -1,14 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { EmailWithTokenDto } from './dto/emailWithToken.dto';
+import { Injectable, Inject } from '@nestjs/common';
+import { EmailWithTokenDto } from '@pdf-me/shared';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class EmailsService {
   constructor(
     @InjectSendGrid() private readonly sendGridService: SendGridService,
     private readonly configService: ConfigService,
+    @Inject('INVOICES_SERVICE') private invoicesService: ClientProxy,
   ) {}
 
   private async sendEmail(config) {
@@ -43,5 +45,9 @@ export class EmailsService {
     } catch (error) {
       return new RpcException({ statusCode: 500, message: error });
     }
+  }
+
+  async sendInvoices() {
+    return false;
   }
 }
