@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { EmailWithTokenDto } from '@pdf-me/shared';
+import { EmailWithTokenDto, InvoiceEntity } from '@pdf-me/shared';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
@@ -48,6 +48,36 @@ export class EmailsService {
   }
 
   async sendInvoices() {
-    return false;
+    // get invoices to send
+    const invoices: InvoiceEntity[] = await this.invoicesService
+      .send({ cmd: 'payments-get-invoices-to-send' }, '')
+      .toPromise();
+    // send
+    const send = [];
+    invoices.forEach(async (invoice) => {
+      try {
+        await this.sendEmail({
+          to: invoice.user.email,
+          subject: 'New invoice',
+          from: 'no-reply@pdf-me.com',
+          html: 'new invoice',
+          attachments: [
+            {
+              content: '',
+              filename: invoice.filename,
+              type: 'application/pdf',
+              disposition: 'attachment',
+            },
+          ],
+        });
+        send.push(invoice.id);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    await this.invoicesService
+      .send({ cmd: 'payments-set-send-invoices' }, send)
+      .toPromise();
   }
 }
