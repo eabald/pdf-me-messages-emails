@@ -11,6 +11,7 @@ export class EmailsService {
     @InjectSendGrid() private readonly sendGridService: SendGridService,
     private readonly configService: ConfigService,
     @Inject('INVOICES_SERVICE') private invoicesService: ClientProxy,
+    @Inject('FILES_SERVICE') private filesService: ClientProxy,
   ) {}
 
   private async sendEmail(config) {
@@ -56,6 +57,9 @@ export class EmailsService {
     const send = [];
     invoices.forEach(async (invoice) => {
       try {
+        const file = await this.filesService
+          .send({ cmd: 'files-get-file' }, '')
+          .toPromise();
         await this.sendEmail({
           to: invoice.user.email,
           subject: 'New invoice',
@@ -63,7 +67,7 @@ export class EmailsService {
           html: 'new invoice',
           attachments: [
             {
-              content: '',
+              content: file,
               filename: invoice.filename,
               type: 'application/pdf',
               disposition: 'attachment',
