@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { EmailsService } from './emails.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { EmailWithTokenDto } from '@pdf-me/shared';
+import { EmailWithTokenDto } from '@eabald/pdf-me-shared';
 
 @Controller('emails')
 export class EmailsController {

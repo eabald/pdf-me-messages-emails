@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { EmailWithTokenDto, InvoiceEntity } from '@pdf-me/shared';
+import { EmailWithTokenDto, InvoiceEntity } from '@eabald/pdf-me-shared';
 import { InjectSendGrid, SendGridService } from '@ntegral/nestjs-sendgrid';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
